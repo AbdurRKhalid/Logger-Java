@@ -1,31 +1,65 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Logger {
-    // Setting the Minimum Log Level as DEBUG, by Default.
-    private LogLevel minimumLogLevel = LogLevel.DEBUG;
+enum LogLevel {
+    DEBUG, INFO, WARNING, ERROR
+}
 
-    // To Hold the Targets.
-    private Map<LogLevel, Consumer<String>> logTargets = new HashMap<>();
+interface LogTarget {
+    void log(String message, LogLevel level);
+}
 
-    // Setting the Minimum Log Level.
-    public void setMinimumLogLevel(LogLevel minimumLogLevel) {
-        this.minimumLogLevel = minimumLogLevel;
+class ConsoleLogTarget implements LogTarget {
+    @Override
+    public void log(String message, LogLevel level) {
+        System.out.println("[" + level + "] " + message);
+    }
+}
+
+class EmailLogTarget implements LogTarget {
+    @Override
+    public void log(String message, LogLevel level) {
+        System.out.println(message);
+    }
+}
+
+class FileLogTarget implements LogTarget {
+    @Override
+    public void log(String message, LogLevel level) {
+        System.out.println(message);
+    }
+}
+
+class ServerApiLogTarget implements LogTarget {
+    @Override
+    public void log(String message, LogLevel level) {
+        System.out.println(message);
+    }
+}
+
+class Logger {
+    private LogLevel minLogLevel;
+    private List<LogTarget> logTargets;
+
+    public Logger(LogLevel minLogLevel) {
+        this.minLogLevel = minLogLevel;
+        this.logTargets = new ArrayList<>();
+        this.logTargets.add(new ConsoleLogTarget()); // default log target
     }
 
-    // Putting the Log Target.
-    public void setLogTarget(LogLevel logLevel, Consumer<String> logTarget) {
-        logTargets.put(logLevel, logTarget);
+    public void setMinLogLevel(LogLevel minLogLevel) {
+        this.minLogLevel = minLogLevel;
     }
 
-    public void log(LogLevel logLevel, String message) {
-        if (logLevel.compareTo(minimumLogLevel) >= 0) {
-            logTargets.forEach((targetLogLevel, logTarget) -> {
-                if(logLevel.compareTo(targetLogLevel) >= 0) {
-                    logTarget.accept(message);
-                }
-            });
+    public void addTarget(LogTarget logTarget) {
+        this.logTargets.add(logTarget);
+    }
+
+    public void log(String message, LogLevel level) {
+        if (level.ordinal() >= minLogLevel.ordinal()) {
+            for (LogTarget logTarget : logTargets) {
+                logTarget.log(message, level);
+            }
         }
     }
 }
