@@ -5,6 +5,7 @@ enum LogLevel {
     DEBUG, INFO, WARNING, ERROR
 }
 
+// An Interface to Implement the Additional Targets for Working.
 interface LogTarget {
     void log(String message, LogLevel level);
 }
